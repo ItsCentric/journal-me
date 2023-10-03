@@ -1,5 +1,6 @@
 <script>
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
+	import UserButton from '$lib/components/UserButton.svelte';
 </script>
 
 <main class="flex flex-col h-full justify-center items-center">
@@ -9,5 +10,6 @@
 	</div>
 	<div>
 		<ThemeSwitcher />
+		<UserButton />
 	</div>
 </main>
