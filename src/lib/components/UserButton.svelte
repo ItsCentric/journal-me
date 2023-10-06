@@ -1,16 +1,12 @@
 <script lang="ts">
-	import { pb } from '$lib/pocketbase';
-	import SignInModal from './SignInModal.svelte';
-
-	$: isSignedIn = pb.authStore.isValid;
-	let dialogRef: HTMLDialogElement | undefined;
+	export let user: App.Locals['user'];
 </script>
 
 <main>
-	<SignInModal bind:dialogRef />
-	{#if isSignedIn}
-		<button class="btn" on:click={() => pb.authStore.clear()}>Sign Out</button>
+	{#if user}
+		<a href="/signOut" class="btn">Sign Out</a>
 	{:else}
-		<button class="btn" on:click={() => dialogRef?.showModal()}>Sign Up</button>
+		<a href="/signUp" class="btn">Sign Up</a>
+		<a href="/signIn" class="btn">Sign In</a>
 	{/if}
 </main>

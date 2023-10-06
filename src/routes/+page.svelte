@@ -1,6 +1,10 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types';
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 	import UserButton from '$lib/components/UserButton.svelte';
+
+	export let data: PageData;
+	const { user } = data;
 </script>
 
 <main class="flex flex-col h-full justify-center items-center">
@@ -10,6 +14,6 @@
 	</div>
 	<div>
 		<ThemeSwitcher />
-		<UserButton />
+		<UserButton {user} />
 	</div>
 </main>
