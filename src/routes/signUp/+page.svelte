@@ -5,8 +5,10 @@
 	import FormTextInput from '$lib/components/FormTextInput.svelte';
 	import { goto } from '$app/navigation';
 	import * as flashModule from 'sveltekit-flash-message/client';
+	import { siGoogle } from 'simple-icons';
 
 	export let data: PageData;
+	const { supabase } = data;
 	const form = superForm(data.form, {
 		flashMessage: {
 			module: flashModule,
@@ -19,6 +21,17 @@
 		delayMs: 1000
 	});
 	const { enhance, delayed } = form;
+	async function handleGoogleSignUp(_event: Event) {
+		await supabase.auth.signInWithOAuth({
+			provider: 'google',
+			options: {
+				queryParams: {
+					access_type: 'offline',
+					prompt: 'consent'
+				}
+			}
+		});
+	}
 </script>
 
 <main class="flex justify-center items-center h-full">
@@ -37,10 +50,6 @@
 			</h2>
 		</div>
 		<form id="sign-up-form" method="POST" action="?/credentialsSignUp" use:enhance>
-			<FormTextInput {form} field="username" placeholder="johndoe123">
-				<svelte:fragment slot="label">Username</svelte:fragment>
-				<svelte:fragment slot="description">Must be at least 3 characters long</svelte:fragment>
-			</FormTextInput>
 			<FormTextInput {form} field="email" placeholder="johndoe@domain.com">
 				<svelte:fragment slot="label">Email</svelte:fragment>
 			</FormTextInput>
@@ -50,12 +59,13 @@
 			</FormTextInput>
 		</form>
 		<div class="divider">OR</div>
-		<div class="w-full flex justify-center">
-			<form method="POST" action="?/oauthSignUp">
-				<button type="submit" class="btn mx-auto">
-					<p>Sign up with Google</p>
-				</button>
-			</form>
+		<div class="flex justify-center">
+			<button class="btn" on:click={handleGoogleSignUp}>
+				<div class="w-4 mr-2 invert">
+					{@html siGoogle.svg}
+				</div>
+				<p>Sign up with Google</p>
+			</button>
 		</div>
 		<div>
 			<button type="submit" class="btn btn-primary w-full mt-6" form="sign-up-form">Sign Up</button>

@@ -1,13 +1,7 @@
 import { loadFlash } from 'sveltekit-flash-message/server';
 
-export const load = loadFlash(({ locals }) => {
-	if (locals.user) {
-		return {
-			user: locals.user
-		};
-	}
-
+export const load = loadFlash(async ({ locals }) => {
 	return {
-		user: undefined
+		session: await locals.getSession()
 	};
 });
