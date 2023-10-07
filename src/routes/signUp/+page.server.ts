@@ -1,9 +1,8 @@
+export const ssr = false;
 import { signUpSchema } from '$lib/schemas.js';
-import { error, fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
-import type { ClientResponseError } from 'pocketbase';
 import { setError, superValidate } from 'sveltekit-superforms/server';
-import handleOAuth from '$lib/handleOAuth.js';
 
 export const load = async () => {
 	const form = await superValidate(signUpSchema);
@@ -13,38 +12,32 @@ export const load = async () => {
 
 export const actions = {
 	credentialsSignUp: async (event) => {
-		const { request, locals } = event;
+		const { request, locals, url } = event;
+		const { supabase } = locals;
 		const form = await superValidate(request, signUpSchema);
 
 		if (!form.valid) return fail(400, { form });
-		const { username, email, password } = form.data;
-		try {
-			await locals.pb
-				.collection('users')
-				.create({ username, email, password, passwordConfirm: password });
-			await locals.pb.collection('users').authWithPassword(email, password);
-			await locals.pb.collection('users').requestVerification(email);
-		} catch (err) {
-			const pbError = err as ClientResponseError;
-			const { data: errors } = pbError;
-			let alreadyExists = false;
-			if (errors.data.email?.code === 'validation_invalid_email') {
-				setError(form, 'email', 'Email already exists');
-				alreadyExists = true;
-			}
-			if (errors.data.username?.code === 'validation_invalid_username') {
-				setError(form, 'username', 'Username already exists');
-				alreadyExists = true;
-			}
-			if (alreadyExists) return fail(pbError.status, { form });
-			throw error(500, 'Something went wrong. Please try again later.');
-		}
+		const { email, password } = form.data;
+		const { data, error } = await supabase.auth.signUp({
+			email,
+			password,
+			options: { emailRedirectTo: `${url.origin}/auth/callback` }
+		});
+
+		if (error) return setError(form, '', error.message);
+		if (!data.user) return setError(form, '', 'Something went wrong.');
+
+		const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
+			data.user.id
+		);
+
+		if (!userData.user && userError?.name === 'AuthApiError')
+			return setError(form, '', 'An account with that email already exists.');
 
 		throw redirect(
 			'/',
 			{ message: 'Sign up successful! Check your email to verify your account.', type: 'success' },
 			event
 		);
-	},
-	oauthSignUp: handleOAuth
+	}
 };
