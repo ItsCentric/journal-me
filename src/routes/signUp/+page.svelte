@@ -6,6 +6,7 @@
 	import { goto } from '$app/navigation';
 	import * as flashModule from 'sveltekit-flash-message/client';
 	import { siGoogle } from 'simple-icons';
+	import toast from 'svelte-french-toast';
 
 	export let data: PageData;
 	const { supabase } = data;
@@ -20,7 +21,7 @@
 		validators: signUpSchema,
 		delayMs: 1000
 	});
-	const { enhance, delayed } = form;
+	const { enhance, delayed, errors } = form;
 	async function handleGoogleSignUp(_event: Event) {
 		await supabase.auth.signInWithOAuth({
 			provider: 'google',
@@ -31,6 +32,10 @@
 				}
 			}
 		});
+	}
+
+	$: if ($errors._errors) {
+		toast.error($errors._errors[0]);
 	}
 </script>
 
