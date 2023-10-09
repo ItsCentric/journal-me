@@ -7,6 +7,7 @@
 	import * as flashModule from 'sveltekit-flash-message/client';
 	import { siGoogle } from 'simple-icons';
 	import toast from 'svelte-french-toast';
+	import FormPasswordInput from '$lib/components/FormPasswordInput.svelte';
 
 	export let data: PageData;
 	const { supabase } = data;
@@ -58,10 +59,10 @@
 			<FormTextInput {form} field="email" placeholder="johndoe@domain.com">
 				<svelte:fragment slot="label">Email</svelte:fragment>
 			</FormTextInput>
-			<FormTextInput {form} field="password" placeholder="Password" type="password">
+			<FormPasswordInput {form} field="password" placeholder="Password">
 				<svelte:fragment slot="label">Password</svelte:fragment>
 				<svelte:fragment slot="description">Must be at least 8 characters long</svelte:fragment>
-			</FormTextInput>
+			</FormPasswordInput>
 		</form>
 		<div class="divider">OR</div>
 		<div class="flex justify-center">

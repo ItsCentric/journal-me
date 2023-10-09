@@ -2,8 +2,8 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { PageData } from './$types';
 	import toast from 'svelte-french-toast';
-	import FormTextInput from '$lib/components/FormTextInput.svelte';
 	import { updatePasswordSchema } from '$lib/schemas';
+	import FormPasswordInput from '$lib/components/FormPasswordInput.svelte';
 
 	export let data: PageData;
 	const form = superForm(data.form, {
@@ -29,13 +29,13 @@
 			<h2 class="card-title opacity-60">Enter your new password below</h2>
 		</div>
 		<form id="reset-password" method="POST" use:enhance>
-			<FormTextInput {form} field="newPassword" type="password">
+			<FormPasswordInput {form} field="newPassword">
 				<svelte:fragment slot="label">New Password</svelte:fragment>
 				<svelte:fragment slot="description">Must be at least 8 characters long</svelte:fragment>
-			</FormTextInput>
-			<FormTextInput {form} field="confirmPassword" type="password">
+			</FormPasswordInput>
+			<FormPasswordInput {form} field="confirmPassword">
 				<svelte:fragment slot="label">Confirm Password</svelte:fragment>
-			</FormTextInput>
+			</FormPasswordInput>
 		</form>
 		<div class="card-actions mt-4">
 			<button class="btn w-full" form="reset-password">Reset Password</button>
