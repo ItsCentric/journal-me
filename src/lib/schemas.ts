@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const signUpSchema = z.object({
 	email: z.string().email(),
-	password: z.string().min(8, { message: 'Password must be at least 8 characters long' })
+	password: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+	termsAndPrivacy: z.boolean().refine((data) => data === true, {
+		message: 'You must agree to the terms and privacy policy'
+	})
 });
 
 export const signInSchema = signUpSchema.extend({

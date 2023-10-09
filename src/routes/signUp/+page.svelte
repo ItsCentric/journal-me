@@ -22,7 +22,7 @@
 		validators: signUpSchema,
 		delayMs: 1000
 	});
-	const { enhance, delayed, errors } = form;
+	const { enhance, delayed, errors, form: formStore } = form;
 	async function handleGoogleSignUp(_event: Event) {
 		await supabase.auth.signInWithOAuth({
 			provider: 'google',
@@ -73,8 +73,28 @@
 				<p>Sign up with Google</p>
 			</button>
 		</div>
-		<div>
-			<button type="submit" class="btn btn-primary w-full mt-6" form="sign-up-form">Sign Up</button>
+		<div class="mt-6 flex flex-col gap-4">
+			<div class="flex flex-col items-center">
+				<div class="flex gap-2">
+					<input
+						name="termsAndPrivacy"
+						type="checkbox"
+						class="checkbox aria-[invalid]:checkbox-error"
+						bind:checked={$formStore.termsAndPrivacy}
+						aria-invalid={$errors.termsAndPrivacy ? 'true' : undefined}
+					/>
+					<p class="text-center">
+						By signing up, you agree to our <a href="/terms" class="link text-accent"
+							>Terms of Service</a
+						>
+						and <a href="/privacy" class="link text-accent">Privacy Policy</a>.
+					</p>
+				</div>
+				{#if $errors.termsAndPrivacy}
+					<small class="text-error">{$errors.termsAndPrivacy}</small>
+				{/if}
+			</div>
+			<button type="submit" class="btn btn-primary w-full" form="sign-up-form">Sign Up</button>
 		</div>
 	</div>
 </main>
