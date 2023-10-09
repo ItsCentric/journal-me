@@ -8,3 +8,17 @@ export const signUpSchema = z.object({
 export const signInSchema = signUpSchema.extend({
 	password: z.string()
 });
+
+export const forgotPasswordSchema = z.object({
+	email: z.string().email()
+});
+
+export const updatePasswordSchema = z
+	.object({
+		newPassword: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+		confirmPassword: z.string()
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: 'Passwords do not match',
+		path: ['confirmPassword']
+	});

@@ -72,5 +72,8 @@
 		<div>
 			<button type="submit" class="btn btn-primary w-full mt-6" form="sign-in-form">Sign in</button>
 		</div>
+		<div class="text-center mt-2">
+			<p>Forgot your password? <a href="/password-reset/email" class="link">No worries</a>.</p>
+		</div>
 	</div>
 </main>
