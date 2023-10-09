@@ -95,6 +95,7 @@
 				{/if}
 			</div>
 			<button type="submit" class="btn btn-primary w-full" form="sign-up-form">Sign Up</button>
+			<button on:click={() => history.back()} class="btn w-full mb-2">Back</button>
 		</div>
 	</div>
 </main>

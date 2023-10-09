@@ -47,9 +47,15 @@
 				Enter your email address and we'll send you a link to reset your password
 			</h2>
 		</div>
-		<form method="POST" on:submit={() => (canSendNextEmail = false)} use:enhance>
+		<form
+			method="POST"
+			on:submit={() => (canSendNextEmail = false)}
+			use:enhance
+			class="flex flex-col gap-2"
+		>
 			<FormTextInput {form} field="email" placeholder="johndoe@domain.com" />
-			<button class="btn w-full mt-2" disabled={!canSendNextEmail}>Send email</button>
+			<button class="btn w-full" disabled={!canSendNextEmail}>Send email</button>
+			<button on:click={() => history.back()} type="button" class="btn w-full">Back</button>
 		</form>
 		{#if $posted && !canSendNextEmail}
 			<small>You may request again in {canSendNextEmailIn} seconds.</small>

@@ -70,8 +70,9 @@
 				<p>Sign in with Google</p>
 			</button>
 		</div>
-		<div>
+		<div class="flex flex-col gap-4">
 			<button type="submit" class="btn btn-primary w-full mt-6" form="sign-in-form">Sign in</button>
+			<button on:click={() => history.back()} class="btn w-full mb-2">Back</button>
 		</div>
 		<div class="text-center mt-2">
 			<p>Forgot your password? <a href="/password-reset/email" class="link">No worries</a>.</p>
