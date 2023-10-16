@@ -1,10 +1,13 @@
-// src/routes/+layout.ts
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
 import type { Database } from '../DatabaseDefinitions';
 
 export const load = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
+	const dataWithFlash = data as {
+		session: (typeof data)['session'];
+		flash: { type: string; message: string } | undefined;
+	};
 
 	const supabase = createSupabaseLoadClient<Database>({
 		supabaseUrl: PUBLIC_SUPABASE_URL,
@@ -17,5 +20,5 @@ export const load = async ({ fetch, data, depends }) => {
 		data: { session }
 	} = await supabase.auth.getSession();
 
-	return { supabase, session };
+	return { supabase, session, flash: dataWithFlash.flash };
 };
