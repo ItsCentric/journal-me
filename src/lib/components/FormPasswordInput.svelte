@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts" generics="T extends AnyZodObject">
-	import { Eye } from 'lucide-svelte';
+	import { Eye, EyeOff } from 'lucide-svelte';
 
 	import type { z } from 'zod';
 	import type { ZodValidation, FormPathLeaves } from 'sveltekit-superforms';
@@ -57,7 +57,11 @@
 			aria-controls="password"
 			class="absolute right-2 top-1/2 p-1 rounded-full -translate-y-1/2 inline hover:bg-neutral/10"
 		>
-			<Eye size={24} />
+			{#if showPassword}
+				<EyeOff size={24} />
+			{:else}
+				<Eye size={24} />
+			{/if}
 		</button>
 	</div>
 	{#if $errors}
