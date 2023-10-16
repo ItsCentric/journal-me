@@ -80,6 +80,7 @@
 						name="termsAndPrivacy"
 						type="checkbox"
 						class="checkbox aria-[invalid]:checkbox-error"
+						form="sign-up-form"
 						bind:checked={$formStore.termsAndPrivacy}
 						aria-invalid={$errors.termsAndPrivacy ? 'true' : undefined}
 					/>
