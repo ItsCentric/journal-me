@@ -3,7 +3,15 @@ import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import { setError, superValidate } from 'sveltekit-superforms/server';
 
-export const load = async () => {
+export const load = async (event) => {
+	const session = await event.locals.getSession();
+	if (!session)
+		throw redirect(
+			303,
+			'/signUp',
+			{ message: 'You must be signed in to reset your password', type: 'error' },
+			event
+		);
 	const form = await superValidate(updatePasswordSchema);
 
 	return { form };
