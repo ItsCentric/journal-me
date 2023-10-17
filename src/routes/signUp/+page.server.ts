@@ -1,4 +1,3 @@
-export const ssr = false;
 import { signUpSchema } from '$lib/schemas.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
