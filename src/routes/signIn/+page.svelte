@@ -5,7 +5,6 @@
 	import FormTextInput from '$lib/components/FormTextInput.svelte';
 	import { goto } from '$app/navigation';
 	import * as flashModule from 'sveltekit-flash-message/client';
-	import { siGoogle } from 'simple-icons';
 	import toast from 'svelte-french-toast';
 	import FormPasswordInput from '$lib/components/FormPasswordInput.svelte';
 
@@ -49,7 +48,7 @@
 	<div class="max-w-3xl w-full">
 		<div class="mb-8">
 			<h1 class="text-5xl font-bold text-center">Welcome back!</h1>
-			<h2 class="text-xl text-center text-neutral-content">
+			<h2 class="text-xl text-center text-base-content/50">
 				Don't have an account? <a href="/signUp" class="link text-accent">Sign up</a>.
 			</h2>
 		</div>
@@ -64,9 +63,11 @@
 		<div class="divider">OR</div>
 		<div class="flex justify-center">
 			<button class="btn" on:click={handleGoogleSignIn}>
-				<div class="w-4 mr-2 invert">
-					{@html siGoogle.svg}
-				</div>
+				<img
+					src="https://cdn.simpleicons.org/google/black/white"
+					alt="google icon"
+					class="w-5 mr-1"
+				/>
 				<p>Sign in with Google</p>
 			</button>
 		</div>

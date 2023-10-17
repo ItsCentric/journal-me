@@ -46,7 +46,6 @@
 	"dependencies": {
 		"lucide-svelte": "^0.275.0",
 		"pocketbase": "^0.18.0",
-		"simple-icons": "^9.16.1",
 		"svelte-french-toast": "^1.2.0",
 		"theme-change": "^2.5.0"
 	}
