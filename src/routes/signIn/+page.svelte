@@ -3,7 +3,6 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { signInSchema } from '$lib/schemas';
 	import FormTextInput from '$lib/components/FormTextInput.svelte';
-	import { goto } from '$app/navigation';
 	import * as flashModule from 'sveltekit-flash-message/client';
 	import toast from 'svelte-french-toast';
 	import FormPasswordInput from '$lib/components/FormPasswordInput.svelte';
