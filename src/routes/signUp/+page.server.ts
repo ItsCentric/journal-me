@@ -23,16 +23,10 @@ export const actions = {
 			password,
 			options: { emailRedirectTo: `${url.origin}/auth/callback` }
 		});
-
 		if (error) return setError(form, '', error.message);
+		if ((data.user?.identities?.length ?? 0) === 0)
+			return setError(form, 'email', 'An account with that email already exists.');
 		if (!data.user) return setError(form, '', 'Something went wrong.');
-
-		const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
-			data.user.id
-		);
-
-		if (!userData.user && userError?.name === 'AuthApiError')
-			return setError(form, '', 'An account with that email already exists.');
 
 		throw redirect(
 			'/',
