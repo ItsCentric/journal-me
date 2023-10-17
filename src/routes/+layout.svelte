@@ -5,8 +5,11 @@
 	import toast, { Toaster } from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import type { PageData } from './$types';
+	import UserButton from '$lib/components/UserButton.svelte';
+	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 
-	export let data;
+	export let data: PageData;
 	let { supabase, session } = data;
 	$: ({ supabase, session } = data);
 	const flash = getFlash(page);
@@ -34,7 +37,16 @@
 	});
 </script>
 
-<div class="h-full">
+<div class="h-full flex flex-col">
 	<Toaster />
-	<slot />
+	<nav class="navbar border-b-neutral border-b">
+		<div class="flex-1">
+			<a href="/" class="text-xl">Journal Me</a>
+		</div>
+		<div class="flex gap-2 items-center">
+			<ThemeSwitcher />
+			<UserButton {session} />
+		</div>
+	</nav>
+	<slot class="flex-1" />
 </div>
