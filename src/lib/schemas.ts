@@ -9,7 +9,8 @@ export const signUpSchema = z.object({
 });
 
 export const signInSchema = signUpSchema.extend({
-	password: z.string()
+	password: z.string(),
+	termsAndPrivacy: z.undefined()
 });
 
 export const forgotPasswordSchema = z.object({
