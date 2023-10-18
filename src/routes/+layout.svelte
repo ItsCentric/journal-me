@@ -5,11 +5,11 @@
 	import toast, { Toaster } from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import type { PageData } from './$types';
+	import type { LayoutData } from './$types';
 	import UserButton from '$lib/components/UserButton.svelte';
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 
-	export let data: PageData;
+	export let data: LayoutData;
 	let { supabase, session } = data;
 	$: ({ supabase, session } = data);
 	const flash = getFlash(page);
