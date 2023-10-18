@@ -4,10 +4,12 @@
 	export let session: Session | null;
 	let dropdown: HTMLDetailsElement | undefined;
 
-	window.addEventListener('click', (event) => {
-		const node = event.target as Node;
-		if (dropdown && !dropdown.contains(node)) dropdown.open = false;
-	});
+	if (typeof window !== 'undefined') {
+		window.addEventListener('click', (event) => {
+			const node = event.target as Node;
+			if (dropdown && !dropdown.contains(node)) dropdown.open = false;
+		});
+	}
 </script>
 
 <main>
