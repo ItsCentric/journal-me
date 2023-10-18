@@ -26,3 +26,12 @@ export const updatePasswordSchema = z
 		message: 'Passwords do not match',
 		path: ['confirmPassword']
 	});
+
+export const createJournalSchema = z.object({
+	title: z.string().nonempty({ message: 'Title cannot be empty' }),
+	description: z
+		.string()
+		.trim()
+		.max(50, { message: 'Description must be 50 characters or less' })
+		.optional()
+});
