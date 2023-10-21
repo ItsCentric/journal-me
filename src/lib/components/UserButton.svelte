@@ -18,7 +18,7 @@
 			<summary class="btn btn-ghost btn-circle">
 				<img src="https://i.pravatar.cc/64" alt="avatar" class="w-16 avatar rounded-full" />
 			</summary>
-			<ul class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+			<ul class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-300 rounded-box w-52">
 				<li>
 					<a href="/" class="btn-disabled">
 						<p class="opacity-40">Profile</p>
