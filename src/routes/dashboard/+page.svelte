@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { Plus } from 'lucide-svelte';
+	import { MoreVertical, Pencil, Plus } from 'lucide-svelte';
 	import type { PageData } from './$types';
-	import FormTextInput from '$lib/components/FormTextInput.svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import * as flashModule from 'sveltekit-flash-message/client';
-	import { createJournalSchema } from '$lib/schemas';
-	import type { Database } from '../../database';
+	import { journalSchema } from '$lib/schemas';
+	import type { Journal } from '../../database';
 	import toast from 'svelte-french-toast';
 	import { fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import JournalModal from '$lib/components/JournalModal.svelte';
+	import { flip } from 'svelte/animate';
+	import { expoOut } from 'svelte/easing';
 
 	export let data: PageData;
 	const { journals: initialJournals, form: pageForm, supabase } = data;
@@ -21,85 +24,130 @@
 		},
 		onResult: ({ result }) => {
 			if (result.type !== 'success') return;
-			createJournalModal?.close();
+			showJournalModal = false;
+		},
+		onSubmit: ({ formData }) => {
+			if (journalModalMode === 'edit' && currentEditingJournal) {
+				formData.set('journalId', currentEditingJournal.id);
+			}
 		},
 		syncFlashMessage: false,
-		validators: createJournalSchema,
+		validators: journalSchema,
 		delayMs: 1000
 	});
-	const { enhance, delayed, errors, form: formStore } = form;
-	let createJournalModal: HTMLDialogElement | undefined;
+	const { delayed, errors } = form;
+	let showJournalModal = false;
+	let journalModalMode: 'create' | 'edit' = 'create';
+	let dropdowns: HTMLDetailsElement[] | null[] = [];
+	let currentEditingJournal: Journal | undefined;
 
 	supabase
 		.channel('custom-all-channel')
 		.on('postgres_changes', { event: '*', schema: 'public', table: 'journals' }, (payload) => {
 			if (payload.eventType === 'INSERT') {
-				const newPayload = payload.new as Database['public']['Tables']['journals']['Row'];
+				const newPayload = payload.new as Journal;
 				journals = [...journals, newPayload];
+			}
+			if (payload.eventType === 'UPDATE') {
+				const newPayload = payload.new as Journal;
+				journals = journals.map((journal) => {
+					if (journal.id === newPayload.id) {
+						return newPayload;
+					}
+					return journal;
+				});
+				journals.sort(
+					(journalA, journalB) => Date.parse(journalB.updated_at) - Date.parse(journalA.updated_at)
+				);
 			}
 		})
 		.subscribe();
+
+	onMount(() =>
+		window.addEventListener('click', (event) => {
+			dropdowns.forEach((dropdownElement) => {
+				if (!dropdownElement) return;
+				const node = event.target as Node;
+				if (!dropdownElement.contains(node)) {
+					dropdownElement.open = false;
+				}
+			});
+		})
+	);
 
 	$: if ($errors._errors) {
 		toast.error($errors._errors[0]);
 	}
 </script>
 
-<main class="container mx-auto py-8 flex flex-col gap-4">
+<main class="container mx-auto py-8 flex flex-col gap-8">
 	{#if $delayed}
 		<div class="absolute w-full h-full bg-neutral/40 flex justify-center items-center">
 			<span class="loading loading-spinner text-primary w-16" />
 		</div>
 	{/if}
-	<dialog bind:this={createJournalModal} class="modal">
-		<div class="modal-box">
-			<h3 class="font-bold text-lg">Create Journal</h3>
-			<p>Let's get you started with a new journal!</p>
-			<form id="journal-create" method="POST" action="?/journalCreate" use:enhance>
-				<FormTextInput {form} field="title" placeholder="My Awesome Journal">
-					<svelte:fragment slot="label">Title</svelte:fragment>
-				</FormTextInput>
-				<FormTextInput
-					{form}
-					field="description"
-					placeholder="This journal is just so amazingly awesome"
-				>
-					<svelte:fragment slot="label">Description</svelte:fragment>
-					<svelte:fragment slot="description">Must be 50 characters or less</svelte:fragment>
-				</FormTextInput>
-				<p class="text-sm mt-1">Character count: {$formStore.description?.length ?? 0}</p>
-			</form>
-			<div class="modal-action">
-				<button type="submit" class="btn" form="journal-create">Create</button>
-				<form method="dialog">
-					<button class="btn btn-error">Cancel</button>
-				</form>
-			</div>
-		</div>
-		<form method="dialog" class="modal-backdrop">
-			<button class="cursor-default" />
-		</form>
-	</dialog>
 	<div class="flex justify-between">
-		<h1 class="text-3xl font-bold">Your Journals</h1>
+		<h1 class="text-4xl font-bold">Your Journals</h1>
 		<div>
-			<button class="btn" on:click={() => createJournalModal?.showModal()}>
+			<button
+				class="btn"
+				on:click={() => {
+					journalModalMode = 'create';
+					showJournalModal = true;
+				}}
+			>
 				<Plus size={16} />
 				<p>Create</p>
 			</button>
 		</div>
 	</div>
 	<div class="grid grid-cols-4 gap-4">
+		<JournalModal
+			mode={journalModalMode}
+			open={showJournalModal}
+			handleOnClose={() => {
+				showJournalModal = false;
+				currentEditingJournal = undefined;
+			}}
+			{currentEditingJournal}
+			{form}
+		/>
 		{#if journals.length > 0}
-			{#each journals as journal (journal.id)}
-				<button class="card border border-neutral hover:bg-neutral-focus" transition:fade>
-					<div class="card-body max-w-full">
-						<h2 class="card-title">{journal.title}</h2>
-						{#if journal.description}
-							<p class="truncate">{journal.description}</p>
-						{/if}
-					</div>
-				</button>
+			{#each journals as journal, i (journal.id)}
+				<div class="indicator w-full h-full" animate:flip={{ duration: 1000, easing: expoOut }}>
+					<details class="dropdown indicator-item" bind:this={dropdowns[i]}>
+						<summary class="btn btn-circle btn-sm border border-neutral z-10 no-animation">
+							<MoreVertical size={16} />
+						</summary>
+						<ul class="menu dropdown-content z-10 p-1 shadow bg-base-300 rounded-box">
+							<li>
+								<button
+									on:click={() => {
+										journalModalMode = 'edit';
+										currentEditingJournal = journal;
+										showJournalModal = true;
+									}}
+								>
+									<Pencil size={16} />
+									<p>Edit</p>
+								</button>
+							</li>
+						</ul>
+					</details>
+					<button
+						class="card border border-neutral hover:bg-neutral-focus w-full h-full"
+						transition:fade
+					>
+						<div class="card-body max-w-full">
+							<div class="flex justify-between">
+								<h2 class="card-title">{journal.title}</h2>
+							</div>
+							{#if journal.description}
+								<p class="truncate">{journal.description}</p>
+							{/if}
+						</div>
+					</button>
+				</div>
 			{/each}
 		{:else}
 			<p>You have no journals yet.</p>

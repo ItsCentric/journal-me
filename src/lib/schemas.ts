@@ -27,7 +27,7 @@ export const updatePasswordSchema = z
 		path: ['confirmPassword']
 	});
 
-export const createJournalSchema = z.object({
+export const journalSchema = z.object({
 	title: z.string().nonempty({ message: 'Title cannot be empty' }),
 	description: z
 		.string()

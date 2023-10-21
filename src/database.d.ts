@@ -89,3 +89,5 @@ export interface Database {
 		};
 	};
 }
+
+export type Journal = Database['public']['Tables']['journals']['Row'];
