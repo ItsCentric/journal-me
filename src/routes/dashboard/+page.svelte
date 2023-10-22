@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MoreVertical, Pencil, Plus } from 'lucide-svelte';
+	import { MoreVertical, Pencil, Plus, Trash } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import { superForm } from 'sveltekit-superforms/client';
 	import * as flashModule from 'sveltekit-flash-message/client';
@@ -11,10 +11,12 @@
 	import JournalModal from '$lib/components/JournalModal.svelte';
 	import { flip } from 'svelte/animate';
 	import { expoOut } from 'svelte/easing';
+	import { page } from '$app/stores';
 
 	export let data: PageData;
 	const { journals: initialJournals, form: pageForm, supabase } = data;
 	let journals = initialJournals;
+	const flash = flashModule.getFlash(page);
 	const form = superForm(pageForm, {
 		flashMessage: {
 			module: flashModule,
@@ -60,16 +62,21 @@
 					(journalA, journalB) => Date.parse(journalB.updated_at) - Date.parse(journalA.updated_at)
 				);
 			}
+			if (payload.eventType === 'DELETE') {
+				const newPayload = payload.old as Journal;
+				journals = journals.filter((journal) => journal.id !== newPayload.id);
+			}
 		})
 		.subscribe();
 
 	onMount(() =>
 		window.addEventListener('click', (event) => {
 			dropdowns.forEach((dropdownElement) => {
-				if (!dropdownElement) return;
-				const node = event.target as Node;
-				if (!dropdownElement.contains(node)) {
-					dropdownElement.open = false;
+				if (dropdownElement) {
+					const node = event.target as Node;
+					if (!dropdownElement.contains(node)) {
+						dropdownElement.open = false;
+					}
 				}
 			});
 		})
@@ -114,7 +121,12 @@
 		/>
 		{#if journals.length > 0}
 			{#each journals as journal, i (journal.id)}
-				<div class="indicator w-full h-full" animate:flip={{ duration: 1000, easing: expoOut }}>
+				<div
+					class={`indicator w-full h-full ${journals.length > 1 ? '' : 'col-[1] row-[1]'}`}
+					animate:flip={{ duration: 1000, easing: expoOut }}
+					in:fade|global={{ delay: 250, duration: 500 }}
+					out:fade|global={{ duration: 500 }}
+				>
 					<details class="dropdown indicator-item" bind:this={dropdowns[i]}>
 						<summary class="btn btn-circle btn-sm border border-neutral z-10 no-animation">
 							<MoreVertical size={16} />
@@ -132,12 +144,20 @@
 									<p>Edit</p>
 								</button>
 							</li>
+							<li>
+								<button
+									on:click={async () => {
+										const { error } = await supabase.from('journals').delete().eq('id', journal.id);
+										if (error) $flash = { type: 'error', message: error.message };
+									}}
+								>
+									<Trash size={16} />
+									<p>Delete</p>
+								</button>
+							</li>
 						</ul>
 					</details>
-					<button
-						class="card border border-neutral hover:bg-neutral-focus w-full h-full"
-						transition:fade
-					>
+					<button class="card border border-neutral hover:bg-neutral-focus w-full h-full">
 						<div class="card-body max-w-full">
 							<div class="flex justify-between">
 								<h2 class="card-title">{journal.title}</h2>
@@ -150,7 +170,13 @@
 				</div>
 			{/each}
 		{:else}
-			<p>You have no journals yet.</p>
+			<p
+				in:fade={{ delay: 250, duration: 500 }}
+				out:fade={{ duration: 500 }}
+				class="col-[1] row-[1]"
+			>
+				You have no journals yet.
+			</p>
 		{/if}
 	</div>
 </main>
